@@ -22,6 +22,18 @@ new_member = jackson_family.add_member (  {
              'age': 33,
              'lucky_numbers':'7, 13, 22'
              })
+newer_member = jackson_family.add_member (  {
+             'name': 'Jane',
+            
+             'age': 35,
+             'lucky_numbers':'10, 14, 3'
+             })
+newest_member = jackson_family.add_member (  {
+             'name': 'Jimmy',
+            
+             'age': 5,
+             'lucky_numbers':'1'
+             })
 
 
 # Handle/serialize errors like a JSON object
@@ -46,6 +58,21 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+@app.route('/members/<int:member_id>', methods=['GET'])
+def handle_get_member_by_id(member_id):
+    member = jackson_family.get_member(member_id)
+
+    if member is None:
+        return {"error": "Member not found"}, 404
+
+    response_body = {
+        'name': member['name'],
+        'last_name': member['last_name'],
+        'age': member['age'],
+        'lucky_numbers': member['lucky_numbers']
+    }
+    return jsonify(response_body), 200
+
 @app.route('/members', methods=['POST'])
 def handle_add_member():
         member = request.get_json()
@@ -60,16 +87,19 @@ def handle_add_member():
             return 'Error lucky numbers is not found', 400
         
         new_member = jackson_family.add_member(member)    
+        return new_member
 
 @app.route('/members/<int:member_id>', methods=['DELETE'])
-def handle_delete_member():
-     position = <int:member_id>
-     if 0 <= position < len(members):
-        deleted_todo = members.pop(position)
-        print("This is the member to delete:", position)
-        return {"message": "Family member deleted successfully", "deleted_member": deleted_member}, 200
+def handle_delete_member(member_id):
+    deleted_member = jackson_family.delete_member(member_id)
+    
+    if deleted_member is not None:
+        return {
+            "message": "Family member deleted successfully",
+            "deleted_member": deleted_member
+        }, 200
     else:
-        return {"error": "Invalid position"}, 400
+        return {"error": "Invalid member ID"}, 400
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
